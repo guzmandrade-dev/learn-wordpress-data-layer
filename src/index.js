@@ -105,7 +105,10 @@ const PagesList = ( { hasResolved, pages } ) => {
 					<tr key={ page.id }>
 						<td>{ decodeEntities( page.title.rendered ) }</td>
 						<td>
-							<PageEditButton pageId={ page.id } />
+							<div className="form-buttons">
+								<PageEditButton pageId={ page.id } />
+								<DeletePageButton pageId={ page.id } />
+							</div>
 						</td>
 					</tr>
 				) ) }
@@ -255,6 +258,32 @@ const CreatePageForm = ( { onCancel, onSaveFinished } ) => {
 			lastError={ lastError }
 			isSaving={ isSaving }
 		/>
+	);
+};
+
+const DeletePageButton = ( { pageId } ) => {
+	const { deleteEntityRecord } = useDispatch( coreDataStore );
+	const handleDelete = () => deleteEntityRecord( 'postType', 'page', pageId );
+	const { isDeleting } = useSelect(
+		select => (
+			{
+				isDeleting: select( coreDataStore ).isDeletingEntityRecord(
+					'postType',
+					'page',
+					pageId
+				),
+			}
+		),
+		[ pageId ]
+	)
+	return (
+		<Button variant="primary" onClick={ handleDelete } disabled={ isDeleting}>
+			{ isDeleting ? (
+				<>
+					<Spinner /> Deleting
+				</>
+			): 'Delete'}
+		</Button>
 	);
 };
 
