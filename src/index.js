@@ -221,12 +221,39 @@ const PageForm = ( {
 const CreatePageForm = ( { onCancel, onSaveFinished } ) => {
 	const [ title, setTitle ] = useState( '' );
 	const handleChange = ( title ) => setTitle( title );
+	const { saveEntityRecord } = useDispatch( coreDataStore );
+	const handleSave = async () => {
+		const savedRecord = await saveEntityRecord( 'postType', 'page', {
+			title,
+			status: 'publish',
+		} );
+		if ( savedRecord ) {
+			onSaveFinished();
+		}
+	};
+	const { lastError, isSaving } = useSelect(
+		( select ) => ( {
+			lastError: select( coreDataStore ).getLastEntitySaveError(
+				'postType',
+				'page'
+			),
+			isSaving: select( coreDataStore ).isSavingEntityRecord(
+				'postType',
+				'page'
+			),
+		} ),
+		[]
+	);
 	return (
 		<PageForm
 			title={ title }
 			onChangeTitle={ setTitle }
 			hasEdits={ !! title }
 			onChange={ handleChange }
+			onCancel={ onCancel }
+			onSave={ handleSave }
+			lastError={ lastError }
+			isSaving={ isSaving }
 		/>
 	);
 };
